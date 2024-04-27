@@ -1,0 +1,81 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Interventions-Admin{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="title">Interventions en cours</h1>
+        <div class="button-wrapper">
+            <a href="addIntervention.php" class="list-btn">Nouvelle Intervention</a>
+        </div><br><br>
+        <table class="interventions-table sortable-table">
+            <thead>
+                <tr>
+                    <th class="description-intervention sortable-column"><a href="#" class="sort" data-column="description">Description</a></th>
+                    <th class="intervenants sortable-column"><a href="#" class="sort" data-column="intervenants">Intervenant</a></th>
+                    <th class="nom-standardiste sortable-column"><a href="#" class="sort" data-column="nomStandardiste">Standardiste</a></th>
+                    <th class="nom-client sortable-column"><a href="#" class="sort" data-column="nomClient">Client</a></th>
+                    <th class="date-intervention sortable-column"><a href="#" class="sort" data-column="date">Date</a></th>
+                    <th class="statut-intervention sortable-column"><a href="#" class="sort" data-column="statutIntervention">Statut</a></th>
+                    <th class="degre-intervention sortable-column"><a href="#" class="sort" data-column="degreIntervention">Degré</a></th>
+                    <th class="actions">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for allIntervention in allInterventions %}
+                    <tr>
+                        <td data-column="description">{{ allIntervention.description}}</td>
+                        <td data-column="intervenants">{{ allIntervention.intervenants }}</td>
+                        <td data-column="nomStandardiste">{{ allIntervention.nomStandardiste }} {{ allIntervention.prenomStandardiste }}</td>
+                        <td data-column="nomClient">{{ allIntervention.nomClient }} {{ allIntervention.prenomClient }}</td>
+                        <td data-column="date">{{ allIntervention.date }}</td>
+                        <td data-column="statutIntervention">{{ allIntervention.statutIntervention}}</td>
+                        <td data-column="degreIntervention">{{ allIntervention.degreIntervention }}</td>
+                        <td>
+                            <a href="modificationInterventionAdmin.php?id={{ allIntervention.id_intervention }}"><i class="bi bi-pencil-square" title="Modifier"></i></a>
+                            <a href="infosInterventionAdmin.php?id={{ allIntervention.id_intervention}}"><i class="bi bi-eye-fill"></i></a> 
+                            <a href="suppIntervention.php?id={{ allIntervention.id_intervention}}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette intervention ?')"> <i class="bi bi-trash" title="Supprimer"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortLinks = document.querySelectorAll('.sort');
+            sortLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const column = this.dataset.column;
+                    sortTable(column);
+                });
+            });
+
+            function sortTable(column) {
+                const table = document.querySelector('.interventions-table');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                // Trie les lignes en fonction de la valeur de la colonne
+                rows.sort((a, b) => {
+                    const aValue = a.querySelector(`[data-column="${column}"]`).innerText;
+                    const bValue = b.querySelector(`[data-column="${column}"]`).innerText;
+                    return aValue.localeCompare(bValue);
+                });
+
+                // Inverse l'ordre si la colonne est déjà triée
+                if (table.dataset.sortedColumn === column) {
+                    rows.reverse();
+                    table.dataset.sortedColumn = '';
+                } else {
+                    table.dataset.sortedColumn = column;
+                }
+
+                // Met à jour l'ordre des lignes dans le tableau
+                tbody.innerHTML = '';
+                rows.forEach(row => tbody.appendChild(row));
+            }
+        });
+    </script>
+{% endblock %}
